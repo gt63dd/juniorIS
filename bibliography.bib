@@ -3,35 +3,23 @@
 % provided by most web sites that allow you to export citations. The string
 % "clrsAlgorithms" is a citation key, and if you were citing the source in a
 % document you would use \cite{clrsAlgorithms}.
-@book{clrsAlgorithms,
-author = {Cormen, Thomas H. and Leiserson, Charles E. and Rivest, Ronald L. and Stein, Clifford},
-title = {Introduction to Algorithms, Third Edition},
-year = {2009},
-isbn = {0262033844},
-publisher = {The MIT Press},
-edition = {3rd},
-annote  = {This is a popular algorithms textbook which is well-cited. In particular, Part VI on graph algorithms will be of interest. Chapter 26 discusses flow networks and introduces commonly used notation. It formally describes the problem of obtaining a maximum flow and its equivalence to obtaining a minimum cut. The classical method of Ford and Fulkerson's algorithm for finding a maximum flow is described, and it includes several examples. Additional methods for obtaining a maximum flow, including the push-relabel method, are also described. The chapter notes include additional references to specific articles which may be helpful, such as those of historical interest (the article in which an algorithm was originally proposed) as well as state-of-the-art improvements (more recent articles to improve the approach).}
-}
 
-@inproceedings{10.1145/3704637.3734789,
-author = {Hug, Sarah and McKay, Mark},
-title = {Problematizing {AI} Literacy Access - Understanding Student {AI} Literacy from Student Voices},
-year = {2025},
-isbn = {9798400706264},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3704637.3734789},
-doi = {10.1145/3704637.3734789},
-abstract = {Domestic undergraduate computer science students formally learn about machine learning and artificial intelligence in upper level undergraduate computing programs, yet they must navigate the lure of ChatGPT and other generative Artificial Intelligence tools that have been found to be somewhat accurate at completing early coding assignments. As AI tools proliferate, messaging about their use in academic settings are varied, and access to AI literacy is unknown. Through an investigation of interviews with Pell grant eligible college students at open access colleges, we address the following research questions: How do low-income undergraduate interview participants describe their uses of and attitudes regarding generative AI tool use for academic purposes? and What elements of AI digital literacy appear to be accessible to interview participants, based on their descriptive statements?},
-booktitle = {Proceedings of the 2025 Conference on Research on Equitable and Sustained Participation in Engineering, Computing, and Technology},
-pages = {339–342},
-numpages = {4},
-keywords = {AI tool use, Pell-Grant eligible students, digital divide, generative AI literacy, qualitative interview},
-location = {Newark, NJ, USA},
-series = {RESPECT 2025}
 }
 
   
+@inbook{10.1145/3672608.3707741,
+author = {Gangwal, Ankit and Reddy, P. Sahithi and Sagar, C. y. k.},
+title = {Swiss Cheese CAPTCHA: A Novel Multi-barrier Mechanism for Bot Detection},
+year = {2025},
+isbn = {9798400706295},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3672608.3707741},
+abstract = {A CAPTCHA is one of the primary barriers between notorious bots and legitimate human users. However, advancements in Artificial Intelligence (AI) have enabled malicious bots to circumvent CAPTCHA challenges effectively. As a result, several types of CAPTCHA have been rendered ineffective. In this paper, we introduce Swiss Cheese CAPTCHA, a novel sensor-based solution designed to be easily solvable by humans while presenting multiple obstructions for bots (similar to the Swiss Cheese Model) even when the sensor outputs can be predicted and interfered with. We leverage a range of human cognitive abilities and Generic Sensor API in modern devices to provide robust protection against automated attacks by making it more computationally expensive for bots to produce a valid answer within a stipulated time. We conducted two user studies to assess our proposal's effectiveness: one involving 116 participants to assess the likability and improvise the design, and the other, with 107 participants, to investigate the impact of improvised design changes on cognitive abilities. Our results from these studies show an average completion time of 4.76 seconds and 6.12 seconds, with a success rate of 90.3\% and 83.25\%, respectively. By analyzing the 2141 resultant trajectories from both user studies, we assess the learnability, error recovery rate, efficiency, and satisfaction of users using the scheme. Finally, we devise an automated attack against our proposal to analyze its security in the real world; we find the probability of attack success is low. We also make our research artifacts publicly available.},
+booktitle = {Proceedings of the 40th ACM/SIGAPP Symposium on Applied Computing},
+pages = {1780--1789},
+numpages = {10},
+annote = {The paper proposes "Swiss Cheese CAPTCHA," a multi-step challenge meant to stay easy for humans but harder for bots by stacking several independent obstacles under a time limit, including signals from device sensors through the Generic Sensor API. It reports two user studies showing most people can complete the challenge in about 5–6 seconds with high success rates, and it uses trajectory data to study how users recover from mistakes and learn the task. The paper also tests security by building an automated attack and finds a low success rate for that attack in their experiments. A strong point is that it evaluates both usability and security, which matters for real e-commerce defenses, while a limitation is that the sensor-based design may not work as well in desktop-heavy reseller scenarios where sensor access is limited. For a navigation-pattern risk scoring system, the main value is as an escalation tool: suspicious sessions can be routed into a stronger challenge instead of being blocked outright, and the paper offers a clear way to measure the security–friction tradeoff when adding that step to a layered defense pipeline.}
 
 
 
@@ -53,7 +41,11 @@ month = jun,
 articleno = {24},
 numpages = {26},
 keywords = {mouse movements, mouse biometrics, humanlike behaviour, evasive web bots, advanced web bots, Web bot detection}
+,
+annote = {This paper presents a detection framework aimed at advanced web bots that spoof browser fingerprints and attempt to imitate human browsing. It builds two separate detectors: one based on session-level web-log features (navigation paths, timing, and request patterns) and another based on mouse-movement features, then fuses the two scores with a rule that relies more heavily on mouse evidence and uses the web-log score when the case is uncertain. The evaluation uses a controlled test site with human sessions plus two bot classes, moderate bots that mainly spoof fingerprints and advanced bots that also simulate humanlike browsing and mouse behavior. Results show the fused approach performs better than a web-log-only detector and remains effective under attempted behavioral imitation, with very strong reported classification metrics. A key limitation is external validity: because the study uses a test environment and simulated bots, real reseller-bot campaigns that use proxy rotation, distributed accounts, and trace replay could shift the feature distributions and reduce performance.}
 }
+
+
 
 
 @inproceedings{10.1145/3538969.3538994,
@@ -73,6 +65,9 @@ keywords = {advanced web bots, evasive web bots, reinforcement learning, web bot
 location = {Vienna, Austria},
 series = {ARES '22}
 }
+
+
+
 
 
 
