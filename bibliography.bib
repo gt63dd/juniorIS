@@ -64,6 +64,8 @@ numpages = {10},
 keywords = {advanced web bots, evasive web bots, reinforcement learning, web bot detection, web logs},
 location = {Vienna, Austria},
 series = {ARES '22}
+,
+annote = {The paper examines whether bots can learn browsing and navigation patterns that slip past behavior-based detectors built from web-log features. It models evasion as a reinforcement learning problem where a bot chooses actions to shape session features while still completing its goal, using a pre-trained detector as the environment and getting rewarded when it is not flagged. Results show simple scripted bots rarely evade, but RL-trained bots can learn evasive strategies and reach much higher evasion rates, with some settings approaching about half of bot sessions avoiding detection after enough training. The paper then shows an attacker–defender loop: once the detector is retrained on the new behaviors, bots can train again and regain evasion capability. A key strength is the explicit adversarial setup and staged evaluation over time, while a limitation is that the experiments focus mainly on manipulating web-log features and do not fully incorporate real reseller-bot constraints like identity and payment linkages, queueing, and rate limits. For navigation-pattern risk scoring, the paper provides a clear threat model and a reusable stress-test method by training adaptive bots to minimize a risk score while still reaching add-to-cart and checkout.}
 }
 
 
