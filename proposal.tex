@@ -18,16 +18,78 @@
 
 \maketitle
 
-In your proposal, you will provide justification on why your project matters based on work which has been done in this area, using in-line citations~\cite{clrsAlgorithms} to refer to existing works. Include what your project will accomplish and how your software will function. 
+\section{Project Topic: Detecting Reseller Bots in Limited Clothing Drops Using Risk Scoring and Navigation Patterns}
 
-When you use an image, such as in Figure~\ref{fig:method}, refer to it in the text.
+\subsection{Motivation and Significance}
+Limited-release clothing drops create extreme bursts of traffic and strong incentives for automation. Reseller bots attempt to gain an advantage by executing faster-than-human navigation paths (product $\rightarrow$ add-to-cart $\rightarrow$ checkout), polling inventory endpoints, and distributing attempts across many accounts or proxies. In practice, purely rule-based defenses (e.g., hard blocks and simple rate limits) are often either too weak against advanced bots or too costly for legitimate customers. This project focuses on a practical middle ground: a risk scoring system that estimates bot-likelihood from session navigation patterns and request timing, then applies calibrated mitigation only when needed.
+
+Prior work shows that navigation and timing signals in web logs can be used to detect evasive bots, and that combining multiple evidence sources can improve robustness. Iliou et al.\ demonstrate that modeling sessions from web logs can be effective, and that adding human-interaction evidence (mouse behavior) raises attacker cost and improves detection under an “advanced bot” threat model \cite{Iliou2021DTRAP}. However, bot detection is not a static problem. Iliou et al.\ also show an adversarial dynamic where reinforcement-learning bots learn navigation behaviors that evade detectors trained on web-log features, and can re-adapt after the detector is retrained \cite{Iliou2022ARES}. This motivates designing a risk score that can be stress-tested against adaptive policies rather than only simple scripted bots. Finally, risk scoring is only valuable if it connects to mitigation decisions. Gangwal et al.\ propose a multi-barrier CAPTCHA mechanism that balances usability and security, suggesting a pathway for escalation when a session appears suspicious \cite{Gangwal2025SwissCheese}. Together, these sources motivate a layered approach: (1) score sessions using navigation patterns, (2) escalate friction for high-risk traffic, and (3) evaluate robustness under evasion.
+
+\subsection{Goals and Contributions}
+The project will produce a working software prototype (``DropGuard'') and an experimental evaluation. The main goals are:
+\begin{enumerate}
+	\item Build a small drop-style e-commerce site (product, cart, checkout) that records detailed session-level event logs.
+	\item Implement multiple bot simulators representing distinct reseller behaviors (fast-path, burst/polling, stealth) and a human-session simulator.
+	\item Design an interpretable risk scoring engine using navigation-path and request-timing features derived from web logs.
+	\item Evaluate tradeoffs between security and user friction by comparing mitigation policies (allow, delay, throttle, challenge).
+	\item Stress-test robustness by introducing adaptive behavior inspired by reinforcement-learning evasion results \cite{Iliou2022ARES}.
+\end{enumerate}
+
+The intended contribution is not to claim a universal defense against all automation, but to provide a measurable, reproducible study: which navigation-pattern features provide the most signal, how early scoring decisions can be made, and how mitigation choices shift outcomes (bot capture rate vs.\ legitimate user friction).
+
+\subsection{Software Description}
+DropGuard will be implemented in Python using FastAPI and a SQLite event store. The system will treat each visitor as a session with a unique session identifier. Each request (page view or API call) will be logged as an event with timestamp, endpoint, response status, and minimal metadata needed for analysis. A risk engine will periodically compute a session score in $[0,1]$ based on features such as:
+\begin{itemize}
+	\item \textbf{Speed features:} time from product-view to add-to-cart, add-to-cart to checkout, median inter-event gap.
+	\item \textbf{Path features:} step skipping, repeated loops, unusually short navigation sequences.
+	\item \textbf{Burstiness:} request rate spikes, polling frequency, retry patterns.
+\end{itemize}
+Mitigation will be applied at sensitive actions (add-to-cart and checkout). Low-risk sessions proceed normally; medium-risk sessions may be delayed or rate-limited; high-risk sessions may be challenged (e.g., a stronger interaction step) or throttled. This approach aligns with research showing that combined evidence and escalation can improve effectiveness while keeping the user experience reasonable \cite{Iliou2021DTRAP,Gangwal2025SwissCheese}.
+
+\subsection{Evaluation Plan}
+Experiments will simulate repeated ``drops'' with limited inventory and concurrent human and bot sessions. Metrics will include:
+\begin{itemize}
+	\item \textbf{Bot capture rate:} percentage of inventory purchased by bots.
+	\item \textbf{Human success rate:} percentage of legitimate sessions completing checkout.
+	\item \textbf{False positives:} legitimate sessions incorrectly challenged or throttled.
+	\item \textbf{Friction cost:} added time to checkout and drop-off rate due to mitigation.
+	\item \textbf{Robustness:} performance under stealth bots and adaptive behavior inspired by RL evasion \cite{Iliou2022ARES}.
+\end{itemize}
+
+\subsection{Logic Diagram}
+Figure~\ref{fig:logic} shows the high-level flow of the system. The user interacts with the drop website, events are logged, a risk score is computed, and policy decides whether to allow, add friction, or throttle.
 
 \begin{figure}[h]
-\begin{center}
-\includegraphics[scale=0.7]{methodology.png}
-\caption{Archie}
-\label{fig:method}       % Give a unique label
-\end{center}
+\centering
+\begin{tikzpicture}[node distance=14mm, every node/.style={font=\small}]
+	ikzstyle{box}=[draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm]
+\node[box] (user) {User / Bot\\Client};
+\node[box, below=of user] (site) {Drop Website\\(FastAPI)};
+\node[box, below left=of site, xshift=-8mm] (log) {Event Logger\\(SQLite)};
+\node[box, below right=of site, xshift=8mm] (risk) {Risk Engine\\(Navigation Features)};
+\node[box, below=of risk] (policy) {Mitigation Policy\\Allow / Delay / Throttle / Challenge};
+
+\draw[->] (user) -- node[right]{requests} (site);
+\draw[->] (site) -- node[left]{events} (log);
+\draw[->] (log) -- node[below]{session features} (risk);
+\draw[->] (risk) -- node[right]{score} (policy);
+\draw[->] (policy.west) .. controls +(left:18mm) and +(right:18mm) .. node[above]{decision} (site.east);
+\end{tikzpicture}
+\caption{DropGuard logic flow: navigation events $\rightarrow$ risk scoring $\rightarrow$ mitigation at sensitive actions.}
+\label{fig:logic}
+\end{figure}
+
+% Optional: Replace these with actual UI sketches you add to your repo.
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering Placeholder for UI sketch 1 (e.g., Product + Cart + Checkout screens).}}
+\caption{UI sketch placeholder 1 (replace with an image file in your repo).}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.9\linewidth}{\centering Placeholder for UI sketch 2 (e.g., Risk score dashboard / admin view).}}
+\caption{UI sketch placeholder 2 (replace with an image file in your repo).}
 \end{figure}
 
 
