@@ -10,7 +10,7 @@
 \usetikzlibrary{positioning}
 \singlespace
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
-\csname title\endcsname{\textbf{Detecting Reseller Bots in Limited Clothing Drops Using Risk Scoring and Navigation Patterns}}
+	itle{\textbf{Detecting Reseller Bots in Limited Clothing Drops Using Risk Scoring and Navigation Patterns}}
 \author{Godfred Tekpor}
 
 \begin{document}
@@ -61,7 +61,7 @@ Figure~\ref{fig:logic} shows the high-level flow of the system. The user interac
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[node distance=14mm, every node/.style={font=\small}]
-\csname tikzstyle\endcsname{box}=[draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm]
+	ikzstyle{box}=[draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm]
 \node[box] (user) {User / Bot\\Client};
 \node[box, below=of user] (site) {Drop Website\\(FastAPI)};
 \node[box, below left=of site, xshift=-8mm] (log) {Event Logger\\(SQLite)};
@@ -78,17 +78,17 @@ Figure~\ref{fig:logic} shows the high-level flow of the system. The user interac
 \label{fig:logic}
 \end{figure}
 
-% Optional: Replace these with actual UI sketches you add to your repo.
+% UI sketches
 \begin{figure}[h]
 \centering
-\fbox{\parbox{0.9\linewidth}{\centering Placeholder for UI sketch 1 (e.g., Product + Cart + Checkout screens).}}
-\caption{UI sketch placeholder 1 (replace with an image file in your repo).}
+\includegraphics[width=0.9\linewidth]{imgs/dropguard-ui.png}
+\caption{Product page and cart summary sketch for a limited drop.}
 \end{figure}
 
 \begin{figure}[h]
 \centering
-\fbox{\parbox{0.9\linewidth}{\centering Placeholder for UI sketch 2 (e.g., Risk score dashboard / admin view).}}
-\caption{UI sketch placeholder 2 (replace with an image file in your repo).}
+\includegraphics[width=0.9\linewidth]{imgs/dropguard-dashboard.png}
+\caption{Risk scoring dashboard sketch for live session monitoring.}
 \end{figure}
 
 
