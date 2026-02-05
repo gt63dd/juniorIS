@@ -93,15 +93,24 @@ Figure~\ref{fig:logic} shows the high-level flow of the system. The user interac
 \end{figure}
 
 
-\newpage
-\section*{Appendix}
-A concise list of features / user stories in the order in which they will be built. A few examples are below to demonstrate the expected scope and level of granularity; you will have more features than this.
-\begin{itemize}
-	\item Default picture display on web application.
-	\item On a button-click, user can separate the image into foreground and background.
-	\item User can select a picture from their desktop.
-	\item Selected picture displays on the web application.
-\end{itemize}
+\appendix
+\section{Feature List (Development Roadmap)}
+\begin{enumerate}
+	\item Implement product page endpoint and static product inventory model.
+	\item Implement cart endpoints (add, remove, update quantity/size).
+	\item Implement checkout endpoint and simulated ``purchase'' action that decrements inventory.
+	\item Create session management (session ID cookies) for all clients.
+	\item Implement structured event logging to SQLite (timestamp, session ID, endpoint, status, metadata).
+	\item Implement feature extraction for navigation patterns from event logs (timing, path, burstiness).
+	\item Implement risk scoring function returning a bot-likelihood score in $[0,1]$.
+	\item Implement mitigation policy gates at add-to-cart and checkout based on risk score.
+	\item Build bot simulator scripts: fast-path bot, burst/polling bot, stealth bot.
+	\item Build a human-session simulator with realistic timing variance and navigation noise.
+	\item Implement experiment runner to launch mixed populations and run repeated drop trials.
+	\item Implement evaluation metrics and produce summary tables/plots (capture rate, false positives, friction).
+	\item \textbf{Stretch:} Add an adaptive bot that tunes timing/path choices to reduce risk score (stress test).
+	\item \textbf{Stretch:} Add a simple admin dashboard to visualize sessions, scores, and mitigation decisions.
+\end{enumerate}
 
 
 \bibliographystyle{acm}
