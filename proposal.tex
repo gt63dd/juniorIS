@@ -11,18 +11,16 @@
 \singlespace
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 
-\author{Godfred Tekpor}
-
 \begin{document}
 
-\maketitle
+
 
 \section{Project Topic: Detecting Reseller Bots in Limited Clothing Drops Using Risk Scoring and Navigation Patterns}
 
 \subsection{Motivation and Significance}
 Limited-release clothing drops create extreme bursts of traffic and strong incentives for automation. Reseller bots attempt to gain an advantage by executing faster-than-human navigation paths (product $\rightarrow$ add-to-cart $\rightarrow$ checkout), polling inventory endpoints, and distributing attempts across many accounts or proxies. In practice, purely rule-based defenses (e.g., hard blocks and simple rate limits) are often either too weak against advanced bots or too costly for legitimate customers. This project focuses on a practical middle ground: a risk scoring system that estimates bot-likelihood from session navigation patterns and request timing, then applies calibrated mitigation only when needed.
 
-Prior work shows that navigation and timing signals in web logs can be used to detect evasive bots, and that combining multiple evidence sources can improve robustness. Iliou et al.\ demonstrate that modeling sessions from web logs can be effective, and that adding human-interaction evidence (mouse behavior) raises attacker cost and improves detection under an “advanced bot” threat model \cite{Iliou2021DTRAP}. However, bot detection is not a static problem. Iliou et al.\ also show an adversarial dynamic where reinforcement-learning bots learn navigation behaviors that evade detectors trained on web-log features, and can re-adapt after the detector is retrained \cite{Iliou2022ARES}. This motivates designing a risk score that can be stress-tested against adaptive policies rather than only simple scripted bots. Finally, risk scoring is only valuable if it connects to mitigation decisions. Gangwal et al.\ propose a multi-barrier CAPTCHA mechanism that balances usability and security, suggesting a pathway for escalation when a session appears suspicious \cite{Gangwal2025SwissCheese}. Together, these sources motivate a layered approach: (1) score sessions using navigation patterns, (2) escalate friction for high-risk traffic, and (3) evaluate robustness under evasion.
+Prior work shows that navigation and timing signals in web logs can be used to detect evasive bots, and that combining multiple evidence sources can improve robustness. Iliou et al.\ demonstrate that modeling sessions from web logs can be effective, and that adding human-interaction evidence (mouse behavior) raises attacker cost and improves detection under an “advanced bot” threat model \cite{10.1145/3447815}. However, bot detection is not a static problem. Iliou et al.\ also show an adversarial dynamic where reinforcement-learning bots learn navigation behaviors that evade detectors trained on web-log features, and can re-adapt after the detector is retrained \cite{10.1145/3538969.3538994}. This motivates designing a risk score that can be stress-tested against adaptive policies rather than only simple scripted bots. Finally, risk scoring is only valuable if it connects to mitigation decisions. Gangwal et al.\ propose a multi-barrier CAPTCHA mechanism that balances usability and security, suggesting a pathway for escalation when a session appears suspicious \cite{10.1145/3672608.3707741}. Together, these sources motivate a layered approach: (1) score sessions using navigation patterns, (2) escalate friction for high-risk traffic, and (3) evaluate robustness under evasion.
 
 \subsection{Goals and Contributions}
 The project will produce a working software prototype (``DropGuard'') and an experimental evaluation. The main goals are:
@@ -31,7 +29,7 @@ The project will produce a working software prototype (``DropGuard'') and an exp
 	\item Implement multiple bot simulators representing distinct reseller behaviors (fast-path, burst/polling, stealth) and a human-session simulator.
 	\item Design an interpretable risk scoring engine using navigation-path and request-timing features derived from web logs.
 	\item Evaluate tradeoffs between security and user friction by comparing mitigation policies (allow, delay, throttle, challenge).
-	\item Stress-test robustness by introducing adaptive behavior inspired by reinforcement-learning evasion results \cite{Iliou2022ARES}.
+	\item Stress-test robustness by introducing adaptive behavior inspired by reinforcement-learning evasion results \cite{10.1145/3538969.3538994}.
 \end{enumerate}
 
 The intended contribution is not to claim a universal defense against all automation, but to provide a measurable, reproducible study: which navigation-pattern features provide the most signal, how early scoring decisions can be made, and how mitigation choices shift outcomes (bot capture rate vs.\ legitimate user friction).
@@ -43,7 +41,7 @@ DropGuard will be implemented in Python using FastAPI and a SQLite event store. 
 	\item \textbf{Path features:} step skipping, repeated loops, unusually short navigation sequences.
 	\item \textbf{Burstiness:} request rate spikes, polling frequency, retry patterns.
 \end{itemize}
-Mitigation will be applied at sensitive actions (add-to-cart and checkout). Low-risk sessions proceed normally; medium-risk sessions may be delayed or rate-limited; high-risk sessions may be challenged (e.g., a stronger interaction step) or throttled. This approach aligns with research showing that combined evidence and escalation can improve effectiveness while keeping the user experience reasonable \cite{Iliou2021DTRAP,Gangwal2025SwissCheese}.
+Mitigation will be applied at sensitive actions (add-to-cart and checkout). Low-risk sessions proceed normally; medium-risk sessions may be delayed or rate-limited; high-risk sessions may be challenged (e.g., a stronger interaction step) or throttled. This approach aligns with research showing that combined evidence and escalation can improve effectiveness while keeping the user experience reasonable \cite{10.1145/3447815,10.1145/3672608.3707741}.
 
 \subsection{Evaluation Plan}
 Experiments will simulate repeated ``drops'' with limited inventory and concurrent human and bot sessions. Metrics will include:
@@ -52,7 +50,7 @@ Experiments will simulate repeated ``drops'' with limited inventory and concurre
 	\item \textbf{Human success rate:} percentage of legitimate sessions completing checkout.
 	\item \textbf{False positives:} legitimate sessions incorrectly challenged or throttled.
 	\item \textbf{Friction cost:} added time to checkout and drop-off rate due to mitigation.
-	\item \textbf{Robustness:} performance under stealth bots and adaptive behavior inspired by RL evasion \cite{Iliou2022ARES}.
+	\item \textbf{Robustness:} performance under stealth bots and adaptive behavior inspired by RL evasion \cite{10.1145/3538969.3538994}.
 \end{itemize}
 
 \subsection{Logic Diagram}
@@ -61,7 +59,7 @@ Figure~\ref{fig:logic} shows the high-level flow of the system. The user interac
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[node distance=14mm, every node/.style={font=\small}]
-	ikzstyle{box}=[draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm]
+	ikzset{box/.style={draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm}}
 \node[box] (user) {User / Bot\\Client};
 \node[box, below=of user] (site) {Drop Website\\(FastAPI)};
 \node[box, below left=of site, xshift=-8mm] (log) {Event Logger\\(SQLite)};
@@ -96,18 +94,18 @@ Figure~\ref{fig:logic} shows the high-level flow of the system. The user interac
 \appendix
 \section{Feature List (Development Roadmap)}
 \begin{enumerate}
-	\item Implement product page endpoint and static product inventory model.
-	\item Implement cart endpoints (add, remove, update quantity/size).
-	\item Implement checkout endpoint and simulated ``purchase'' action that decrements inventory.
-	\item Create session management (session ID cookies) for all clients.
-	\item Implement structured event logging to SQLite (timestamp, session ID, endpoint, status, metadata).
-	\item Implement feature extraction for navigation patterns from event logs (timing, path, burstiness).
-	\item Implement risk scoring function returning a bot-likelihood score in $[0,1]$.
-	\item Implement mitigation policy gates at add-to-cart and checkout based on risk score.
-	\item Build bot simulator scripts: fast-path bot, burst/polling bot, stealth bot.
-	\item Build a human-session simulator with realistic timing variance and navigation noise.
-	\item Implement experiment runner to launch mixed populations and run repeated drop trials.
-	\item Implement evaluation metrics and produce summary tables/plots (capture rate, false positives, friction).
+	\item Implement product page endpoint and static product inventory model.(1)
+	\item Implement cart endpoints (add, remove, update quantity/size).(1)
+	\item Implement checkout endpoint and simulated ``purchase'' action that decrements inventory.(1)
+	\item Create session management (session ID cookies) for all clients.(4)
+	\item Implement structured event logging to SQLite (timestamp, session ID, endpoint, status, metadata).(1.5)
+	\item Implement feature extraction for navigation patterns from event logs (timing, path, burstiness).(2)
+	\item Implement risk scoring function returning a bot-likelihood score in $[0,1]$.(3)
+	\item Implement mitigation policy gates at add-to-cart and checkout based on risk score.(1)
+	\item Build bot simulator scripts: fast-path bot, burst/polling bot, stealth bot.(13)
+	\item Build a human-session simulator with realistic timing variance and navigation noise.(1)
+	\item Implement experiment runner to launch mixed populations and run repeated drop trials.(2)
+	\item Implement evaluation metrics and produce summary tables/plots (capture rate, false positives, friction).(3)
 	\item \textbf{Stretch:} Add an adaptive bot that tunes timing/path choices to reduce risk score (stress test).
 	\item \textbf{Stretch:} Add a simple admin dashboard to visualize sessions, scores, and mitigation decisions.
 \end{enumerate}
