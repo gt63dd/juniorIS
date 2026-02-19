@@ -13,7 +13,8 @@ journal = {Computers \& Security},
 volume = {97},
 pages = {102001},
 year = {2020},
-publisher = {Elsevier}
+publisher = {Elsevier},
+annote = {This article introduces “biostatistics” style features for bot detection that emphasize human interaction signals rather than only server-side request patterns. The authors argue that many bot detectors are too tailored to specific websites or attack types, so they propose more general features derived from how humans complete tasks online. Examples include timing-related signals such as time spent on pages, time spent in form fields, and patterns that capture how users move through forms (for example, focus changes, field navigation behaviors, and typing dynamics). The goal is to detect bots by identifying interaction traces that differ from natural human behavior, especially in workflows like registration and checkout where automation is common. The paper also discusses efficiency and scalability considerations when processing large volumes of sessions, proposing methods to structure and group behavior patterns for classification. Credibility-wise, this is a peer reviewed security publication that offers a strong conceptual foundation: behavioral authenticity is harder to fake perfectly than headers or IP patterns. The main tradeoff is implementation complexity, since collecting these signals often requires client-side instrumentation and careful privacy handling. For my reseller bot project, these features map directly to checkout abuse, giving me a justified feature set for detecting scripted purchasing behavior.}
 }
 
 @article{rahman2020forensic,
