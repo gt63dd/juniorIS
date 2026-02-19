@@ -36,6 +36,17 @@ year = {2020},
 publisher = {Elsevier}
 }
 
+@article{stassopoulou2009web,
+author = {Stassopoulou, Athena and Dikaiakos, Marios D},
+title = {Web robot detection: A probabilistic reasoning approach},
+journal = {Computer Networks},
+volume = {53},
+number = {3},
+pages = {265--278},
+year = {2009},
+publisher = {Elsevier},
+annote = {This article proposes a web robot detection approach that relies on server access logs and session-level classification. The authors first transform raw log requests into browsing sessions using rules that split visits based on inactivity thresholds, then compute behavioral features from each session. They classify sessions as human or robot using a Bayesian network, which is useful because it produces not only a label but also a probability score that reflects confidence. The paper emphasizes that single indicators (like user agent strings) are weak on their own, so combining multiple signals improves reliability. The evaluation uses real log data and reports strong detection performance, while also acknowledging failure cases such as short sessions, ambiguous browsing patterns, or traffic types that do not fit the training distribution. From a credibility standpoint, this is a peer reviewed journal article with a clear, reproducible modeling pipeline and a realistic data source. The main limitation is that it is log-centric, so it may miss modern client-side indicators (JavaScript execution, mouse movement, typing cadence). For my reseller bot project, this paper supports building a baseline risk scoring model from session features, then using the score to trigger mitigation like throttling, step-up checks, or queue placement.}
+}
 
   
 @inbook{10.1145/3672608.3707741,
