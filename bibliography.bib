@@ -33,7 +33,8 @@ journal = {Procedia Computer Science},
 volume = {176},
 pages = {1621--1625},
 year = {2020},
-publisher = {Elsevier}
+publisher = {Elsevier},
+annote = {This paper focuses on detecting bots in web traffic when bots can spoof user agent strings. The authors argue that relying on user agent alone is unreliable, so they combine user agent information with user behavior features extracted from web logs. They define visits as cookie-based sessions with an inactivity timeout and propose a detection model that improves bot identification by incorporating patterns of navigation and request behavior. A major practical contribution is the discussion of labeling: they suggest using whether JavaScript executed as a signal for human activity, while acknowledging that labeling can be imperfect due to network conditions and because advanced bots may execute JavaScript. The paper frames bot filtering as essential for preventing bots from corrupting analytics and decision-making systems built on web log data. Credibility-wise, it is published as a conference proceedings style paper, so it is shorter and less detailed than a full journal study, but it still presents a clear and realistic approach grounded in production-style data. For my reseller bot project, this directly supports two design choices: treat user agent as a weak feature, and prioritize behavioral plus client capability signals to catch automation that tries to blend in.}
 }
 
 @article{stassopoulou2009web,
