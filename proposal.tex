@@ -12,106 +12,88 @@
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 
 \begin{document}
+\title{DropGuard Lite: Log-Based Bot Risk Scoring Using Real Human Checkout Sessions}
+\author{Godfred Tekpor}
+\date{February 19, 2026}
 
+\maketitle
 
+\section{Project Topic Proposal}
 
-\section{Project Topic: Detecting Reseller Bots in Limited Clothing Drops Using Risk Scoring and Navigation Patterns}
+Limited release clothing drops create a short, high intensity buying window where automated bots can acquire inventory faster than real shoppers. This reduces fairness for customers and increases operational burden for stores, especially when automated traffic overwhelms the purchase flow. Many commercial defenses rely on large scale signals such as device fingerprinting, third party intelligence feeds, and proprietary anti abuse infrastructure. Those systems are difficult to reproduce in a junior independent study. This project narrows the scope to a measurable, reproducible question: how much bot detection signal can be extracted from server side session logs and interaction timing, especially when the legitimate baseline comes from real human sessions instead of scripted simulations.
 
-\subsection{Motivation and Significance}
-Limited-release clothing drops create extreme bursts of traffic and strong incentives for automation. Reseller bots attempt to gain an advantage by executing faster-than-human navigation paths (product $\rightarrow$ add-to-cart $\rightarrow$ checkout), polling inventory endpoints, and distributing attempts across many accounts or proxies. In practice, purely rule-based defenses (e.g., hard blocks and simple rate limits) are often either too weak against advanced bots or too costly for legitimate customers. This project focuses on a practical middle ground: a risk scoring system that estimates bot-likelihood from session navigation patterns and request timing, then applies calibrated mitigation only when needed.
+Prior work suggests that combining web log evidence with behavioral signals improves robustness against advanced automation. Iliou et al. show that pairing web logs with mouse behavioral biometrics can help detect advanced web bots that attempt to evade detection \cite{10.1145/3447815}. Challenge based mechanisms can also help, but they can increase friction and can be attacked, so the system design should be evaluated for usability tradeoffs \cite{10.1145/3672608.3707741}. Research on modeling bot sessions and arrival processes motivates a session level view of automation behavior that can be analyzed from aggregated request traces \cite{10.1145/3538969.3538994}. Building on these ideas, DropGuard Lite implements an interpretable, log based risk score and evaluates simple mitigation policies at add to cart and checkout.
 
-Prior work shows that navigation and timing signals in web logs can be used to detect evasive bots, and that combining multiple evidence sources can improve robustness. Iliou et al.\ demonstrate that modeling sessions from web logs can be effective, and that adding human-interaction evidence (mouse behavior) raises attacker cost and improves detection under an “advanced bot” threat model \cite{10.1145/3447815}. However, bot detection is not a static problem. Iliou et al.\ also show an adversarial dynamic where reinforcement-learning bots learn navigation behaviors that evade detectors trained on web-log features, and can re-adapt after the detector is retrained \cite{10.1145/3538969.3538994}. This motivates designing a risk score that can be stress-tested against adaptive policies rather than only simple scripted bots. Finally, risk scoring is only valuable if it connects to mitigation decisions. Gangwal et al.\ propose a multi-barrier CAPTCHA mechanism that balances usability and security, suggesting a pathway for escalation when a session appears suspicious \cite{10.1145/3672608.3707741}. Together, these sources motivate a layered approach: (1) score sessions using navigation patterns, (2) escalate friction for high-risk traffic, and (3) evaluate robustness under evasion.
+\subsection*{What I will build}
 
-\subsection{Goals and Contributions}
-The project will produce a working software prototype (``DropGuard'') and an experimental evaluation. The main goals are:
+The core software artifact is a minimal drop style web application with product browsing, cart management, and a simulated checkout flow. The application logs each request into an event table keyed by a random session identifier. A feature extraction pipeline aggregates events into per session features that capture speed, navigation path structure, and burst behavior. An interpretable risk score in the range $[0,1]$ is computed from weighted thresholds over these features. Finally, the application applies mitigation gates at sensitive actions such as add to cart and checkout, using a small set of policies such as allow, delay, or throttle or block.
+
+\subsection*{Inputs and outputs}
+
+Inputs include HTTP requests from two sources. The first source is real human sessions collected from volunteers using the site normally during controlled drop windows. The second source is automated bot sessions generated by a fast path checkout script that attempts product to cart to checkout with minimal delay. Outputs include the SQLite event log, a per session feature table, a per session risk score table, and experiment summaries that report bot share of inventory, real human checkout success rate, false positives, and friction measures such as added time or abandonment after mitigation.
+
+\subsection*{Event logging schema}
+
+Each request produces one event row with the following fields: event\_id, timestamp, session\_id, endpoint, method, status\_code, latency\_ms, and optional user\_agent and metadata\_json. The goal is to keep the logging schema simple enough to implement correctly, while still supporting meaningful per session analysis.
+
+\subsection*{Real human sessions with permission}
+
+A defining change in the revised proposal is that legitimate behavior is collected from real human sessions, not from a scripted human like simulator. Volunteers will see a consent screen before any telemetry is logged. The consent screen explains what is recorded, why it is recorded, and how it is stored. The system will not collect names, emails, addresses, payment information, or any direct identifiers. Checkout is simulated and records purchase success without processing payments, and participants will be instructed not to enter real personal data. Session identifiers are random and are not tied to identity. If the institution requires IRB or departmental review, I will follow the required process before collecting any human data.
+
+\subsection*{Bot variants in scope}
+
+To keep the project achievable while still realistic, I will implement one bot type in scope. The fast path checkout bot navigates product to cart to checkout with minimal delay. A stealth pacing bot that adds random delays and more normal navigation is a stretch goal if time permits.
+
+\subsection*{Evaluation plan}
+
+Evaluation will use repeated drop runs that mix real human sessions and bot sessions. Each run uses a fixed inventory count and a scheduled drop start time. I will compare mitigation thresholds and policies by measuring bot share of inventory, real human checkout success rate, false positive rate for humans who are delayed or blocked, and friction metrics such as added time to checkout and abandonment after mitigation. The intended outcome is a clear, reproducible tradeoff curve rather than a claim of universal bot prevention.
+
+\subsection*{Figures}
+
+Figure~\ref{fig:architecture} shows the end to end system flow from requests to logging, feature extraction, risk scoring, mitigation, and metrics. Figure~\ref{fig:ui} shows a UI sketch for the drop site, including the consent notice and the basic purchase flow.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\linewidth]{imgs/dropguard-dashboard.png}
+  \caption{Proposed architecture for DropGuard Lite. The system logs session events, extracts per session features, computes a risk score, and applies mitigation at add to cart and checkout.}
+  \label{fig:architecture}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.95\linewidth]{imgs/dropguard-ui.png}
+  \caption{Prototype UI sketch for the drop site. The interface supports product viewing, cart actions, a simulated checkout flow, and a consent notice for session telemetry logging.}
+  \label{fig:ui}
+\end{figure}
+
+\section{Appendix: Feature List (Development Roadmap)}
+
+Planned features for DropGuard Lite, in completion order:
+
 \begin{enumerate}
-	\item Build a small drop-style e-commerce site (product, cart, checkout) that records detailed session-level event logs.
-	\item Implement multiple bot simulators representing distinct reseller behaviors (fast-path, burst/polling, stealth) and a human-session simulator.
-	\item Design an interpretable risk scoring engine using navigation-path and request-timing features derived from web logs.
-	\item Evaluate tradeoffs between security and user friction by comparing mitigation policies (allow, delay, throttle, challenge).
-	\item Stress-test robustness by introducing adaptive behavior inspired by reinforcement-learning evasion results \cite{10.1145/3538969.3538994}.
+  \item Implement product listing and product detail endpoints with fixed inventory and scheduled drop start time.
+  \item Implement cart endpoints (add, remove, update quantity) tied to a session ID cookie.
+  \item Implement simulated checkout that records purchase success and decrements inventory without collecting payment data.
+  \item Implement an event logging layer that stores one row per request in SQLite using the defined schema.
+  \item Implement a consent screen that requires explicit permission before any session telemetry is logged.
+  \item Implement a data export script that outputs a clean session event table for analysis.
+  \item Implement per session feature extraction (speed features, path features, burst features).
+  \item Implement an interpretable risk scoring function that maps features to a score in $[0,1]$.
+  \item Implement mitigation gates at add to cart and checkout (allow, delay, throttle or block) with configurable thresholds.
+  \item Implement a fast checkout bot client script to generate automated traffic.
+  \item Implement an experiment runner that mixes bot scripts with real human sessions and runs repeated trials.
+  \item Implement evaluation metrics and produce summary tables and plots (bot inventory share, human success rate, false positives, friction).
 \end{enumerate}
 
-The intended contribution is not to claim a universal defense against all automation, but to provide a measurable, reproducible study: which navigation-pattern features provide the most signal, how early scoring decisions can be made, and how mitigation choices shift outcomes (bot capture rate vs.\ legitimate user friction).
+Stretch goals if time permits:
 
-\subsection{Software Description}
-DropGuard will be implemented in Python using FastAPI and a SQLite event store. The system will treat each visitor as a session with a unique session identifier. Each request (page view or API call) will be logged as an event with timestamp, endpoint, response status, and minimal metadata needed for analysis. A risk engine will periodically compute a session score in $[0,1]$ based on features such as:
-\begin{itemize}
-	\item \textbf{Speed features:} time from product-view to add-to-cart, add-to-cart to checkout, median inter-event gap.
-	\item \textbf{Path features:} step skipping, repeated loops, unusually short navigation sequences.
-	\item \textbf{Burstiness:} request rate spikes, polling frequency, retry patterns.
-\end{itemize}
-Mitigation will be applied at sensitive actions (add-to-cart and checkout). Low-risk sessions proceed normally; medium-risk sessions may be delayed or rate-limited; high-risk sessions may be challenged (e.g., a stronger interaction step) or throttled. This approach aligns with research showing that combined evidence and escalation can improve effectiveness while keeping the user experience reasonable \cite{10.1145/3447815,10.1145/3672608.3707741}.
-
-\subsection{Evaluation Plan}
-Experiments will simulate repeated ``drops'' with limited inventory and concurrent human and bot sessions. Metrics will include:
-\begin{itemize}
-	\item \textbf{Bot capture rate:} percentage of inventory purchased by bots.
-	\item \textbf{Human success rate:} percentage of legitimate sessions completing checkout.
-	\item \textbf{False positives:} legitimate sessions incorrectly challenged or throttled.
-	\item \textbf{Friction cost:} added time to checkout and drop-off rate due to mitigation.
-	\item \textbf{Robustness:} performance under stealth bots and adaptive behavior inspired by RL evasion \cite{10.1145/3538969.3538994}.
-\end{itemize}
-
-\subsection{Logic Diagram}
-Figure~\ref{fig:logic} shows the high-level flow of the system. The user interacts with the drop website, events are logged, a risk score is computed, and policy decides whether to allow, add friction, or throttle.
-
-\begin{figure}[h]
-\centering
-\begin{tikzpicture}[node distance=14mm, every node/.style={font=\small}]
-	ikzset{box/.style={draw, rounded corners, align=center, minimum width=3.7cm, minimum height=0.9cm}}
-\node[box] (user) {User / Bot\\Client};
-\node[box, below=of user] (site) {Drop Website\\(FastAPI)};
-\node[box, below left=of site, xshift=-8mm] (log) {Event Logger\\(SQLite)};
-\node[box, below right=of site, xshift=8mm] (risk) {Risk Engine\\(Navigation Features)};
-\node[box, below=of risk] (policy) {Mitigation Policy\\Allow / Delay / Throttle / Challenge};
-
-\draw[->] (user) -- node[right]{requests} (site);
-\draw[->] (site) -- node[left]{events} (log);
-\draw[->] (log) -- node[below]{session features} (risk);
-\draw[->] (risk) -- node[right]{score} (policy);
-\draw[->] (policy.west) .. controls +(left:18mm) and +(right:18mm) .. node[above]{decision} (site.east);
-\end{tikzpicture}
-\caption{DropGuard logic flow: navigation events $\rightarrow$ risk scoring $\rightarrow$ mitigation at sensitive actions.}
-\label{fig:logic}
-\end{figure}
-
-% UI sketches
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\linewidth]{imgs/dropguard-ui.png}
-\caption{Product page and cart summary sketch for a limited drop.}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\linewidth]{imgs/dropguard-dashboard.png}
-\caption{Risk scoring dashboard sketch for live session monitoring.}
-\end{figure}
-
-
-\newpage
-\appendix
-\section{Feature List (Development Roadmap)}
 \begin{enumerate}
-	\item Implement product page endpoint and static product inventory model.(1)
-	\item Implement cart endpoints (add, remove, update quantity/size).(1)
-	\item Implement checkout endpoint and simulated ``purchase'' action that decrements inventory.(1)
-	\item Create session management (session ID cookies) for all clients.(4)
-	\item Implement structured event logging to SQLite (timestamp, session ID, endpoint, status, metadata).(1.5)
-	\item Implement feature extraction for navigation patterns from event logs (timing, path, burstiness).(2)
-	\item Implement risk scoring function returning a bot-likelihood score in $[0,1]$.(3)
-	\item Implement mitigation policy gates at add-to-cart and checkout based on risk score.(1)
-	\item Build bot simulator scripts: fast-path bot, burst/polling bot, stealth bot.(13)
-	\item Build a human-session simulator with realistic timing variance and navigation noise.(1)
-	\item Implement experiment runner to launch mixed populations and run repeated drop trials.(2)
-	\item Implement evaluation metrics and produce summary tables/plots (capture rate, false positives, friction).(3)
-	\item \textbf{Stretch:} Add an adaptive bot that tunes timing/path choices to reduce risk score (stress test).
-	\item \textbf{Stretch:} Add a simple admin dashboard to visualize sessions, scores, and mitigation decisions.
+  \item Add a stealth pacing bot variant that randomizes timing and navigation to stress test the risk score.
+  \item Add a read only monitoring page showing recent sessions, features, and risk scores.
+  \item Replace fixed delays with a simple queue mechanism for high risk sessions.
 \end{enumerate}
-
 
 \bibliographystyle{acm}
-\bibliography{bibliography.bib}
+\bibliography{bibliography}
 
 \end{document}
