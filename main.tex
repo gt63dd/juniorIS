@@ -41,6 +41,8 @@ Another line of work examines challenge-based defenses such as CAPTCHAs and rate
 
 The approach implemented in DropGuard Lite follows this trend toward interpretable behavioral detection. Instead of relying on heavy machine learning models or intrusive client-side instrumentation, the system analyzes server-side logs to identify suspicious patterns in request timing, navigation behavior, and action sequences. These features are aggregated into a simple risk score that can be used to trigger mitigation policies during critical stages of the purchase process.
 
+By grounding the system design in existing research on behavioral bot detection and log-based forensic analysis, this project demonstrates how a lightweight, reproducible framework can still capture meaningful signals of automated purchasing behavior. The resulting system provides a practical testbed for evaluating how simple behavioral indicators can improve fairness during limited release product drops.
+
 \section{Background}
 Automated web bots are software programs that perform tasks on websites without direct human interaction. These bots can serve many legitimate purposes, such as search engine indexing or automated testing. However, malicious bots are frequently used for activities such as credential stuffing, scraping protected data, denial-of-service attacks, and automated purchasing. In the context of limited product releases, reseller bots are designed specifically to monitor inventory availability and execute purchases as quickly as possible.
 
