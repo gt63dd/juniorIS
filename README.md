@@ -1,5 +1,6 @@
-# Your Project Title Here
-A brief description.
+# DropGuard Lite
+
+A minimal drop-style e-commerce API for detecting reseller bots using log-based risk scoring. This repo starts with product and cart endpoints plus session handling.
 
 
 ## Feature Calendar
@@ -22,3 +23,23 @@ A brief description.
 | [Metrics + reporting (tables/plots)](https://github.com/gt63dd/juniorIS/issues/14) | 5/20/26 | |
 | [Adaptive bot stress test (Stretch)](https://github.com/gt63dd/juniorIS/issues/15) | 5/27/26 | |
 | [Admin dashboard for sessions and scores (Stretch)](https://github.com/gt63dd/juniorIS/issues/16) | 6/3/26 | |
+
+## Quickstart
+
+- Product listing and detail endpoints live under `/products`.
+- Cart endpoints live under `/cart` and use a session cookie.
+
+### Run locally
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn dropguard.app:app --reload --app-dir src
+```
+
+### Run tests
+
+```bash
+pytest
+```
