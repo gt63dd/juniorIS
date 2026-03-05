@@ -36,6 +36,8 @@ One key challenge in detecting automated behavior is that modern bots increasing
 
 Because of these developments, researchers have increasingly explored behavioral analysis techniques that focus on how users interact with a website rather than simply how frequently they send requests. Rahman and Tomar \cite{rahman2020new} propose the use of behavioral interaction features derived from user activity such as time spent on pages, form navigation behavior, and typing dynamics. These features attempt to capture patterns that are difficult for automated scripts to perfectly replicate. By examining the structure and timing of user interactions, it becomes possible to identify behavioral signatures that distinguish human users from automated programs.
 
+In addition to behavioral detection, web forensics research has explored how server-side logs can be used to reconstruct bot activity. Rahman and Tomar \cite{rahman2020forensic} present a framework for investigating bot-driven web crimes using structured analysis of log data. Their approach highlights the importance of session reconstruction, where individual HTTP requests are grouped into user sessions that reveal higher-level behavior patterns. This idea is particularly relevant for analyzing automated purchasing bots, which often follow predictable navigation sequences during checkout.
+
 \section{Methodology}
 Dijkstra's algorithm was chosen for single-source shortest path computation on graphs with non-negative edge weights, following the implementation presented in CLRS~\cite{clrsAlgorithms}.
 
