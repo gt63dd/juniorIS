@@ -12,6 +12,11 @@
 *.cb2
 .*.lb
 
+## OS and Python artifacts:
+.DS_Store
+__pycache__/
+*.pyc
+
 ## Intermediate documents:
 *.dvi
 *.xdv
