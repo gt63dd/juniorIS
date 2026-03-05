@@ -21,6 +21,8 @@ Online retail platforms increasingly face challenges from automated bots that ex
 
 Traditional anti-bot systems often rely on large-scale infrastructure and proprietary signals such as device fingerprinting, behavioral biometrics, or global threat intelligence feeds. While these approaches can be effective, they typically require significant engineering resources and access to large datasets. Such systems are difficult to reproduce in a small-scale academic project. Therefore, this project explores a simpler but still meaningful question: how much useful bot detection signal can be extracted directly from server-side logs and session-level interaction patterns.
 
+The goal of this research is to design and evaluate a lightweight detection system called \textit{DropGuard Lite}. Rather than relying on complex external services, the system analyzes request logs and session behavior to identify suspicious activity. The approach focuses on timing patterns, navigation behavior, and burst request characteristics that differ between automated bots and legitimate human shoppers. The system computes a per-session risk score and applies mitigation strategies at critical steps such as adding items to a cart or completing checkout.
+
 \section{Related Works}
 
 \section{Methodology}
