@@ -31,6 +31,8 @@ Ultimately, this project contributes a reproducible framework for studying autom
 
 A growing body of research has examined methods for detecting automated web activity using behavioral and statistical techniques. While many approaches rely on complex machine learning systems, several studies demonstrate that carefully designed behavioral features can provide strong signals for identifying automated bots.
 
+Rahman and Tomar \cite{rahman2020new} propose a feature engineering approach inspired by biostatistics that focuses on modeling human interaction patterns. Their work emphasizes the importance of features derived from real user behavior rather than simple request counts or network metadata. Examples include time spent on form fields, patterns of field navigation, and variations in user interaction timing. The authors argue that these signals are particularly valuable because they capture subtle aspects of human behavior that are difficult for automated scripts to reproduce consistently. This research provides a conceptual foundation for the feature extraction pipeline used in this project.
+
 \section{Background}
 Automated web bots are software programs that perform tasks on websites without direct human interaction. These bots can serve many legitimate purposes, such as search engine indexing or automated testing. However, malicious bots are frequently used for activities such as credential stuffing, scraping protected data, denial-of-service attacks, and automated purchasing. In the context of limited product releases, reseller bots are designed specifically to monitor inventory availability and execute purchases as quickly as possible.
 
