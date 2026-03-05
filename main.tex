@@ -34,6 +34,8 @@ Automated web bots are software programs that perform tasks on websites without 
 
 One key challenge in detecting automated behavior is that modern bots increasingly mimic human browsing patterns. Early bot detection approaches relied on simple signals such as unusual user-agent strings or extremely high request rates. While these signals can still identify basic bots, more advanced automation tools incorporate techniques that reduce obvious anomalies. For example, bots may introduce randomized delays, rotate IP addresses, or simulate browser behavior using headless browsers.
 
+Because of these developments, researchers have increasingly explored behavioral analysis techniques that focus on how users interact with a website rather than simply how frequently they send requests. Rahman and Tomar \cite{rahman2020new} propose the use of behavioral interaction features derived from user activity such as time spent on pages, form navigation behavior, and typing dynamics. These features attempt to capture patterns that are difficult for automated scripts to perfectly replicate. By examining the structure and timing of user interactions, it becomes possible to identify behavioral signatures that distinguish human users from automated programs.
+
 \section{Methodology}
 Dijkstra's algorithm was chosen for single-source shortest path computation on graphs with non-negative edge weights, following the implementation presented in CLRS~\cite{clrsAlgorithms}.
 
