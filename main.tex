@@ -37,6 +37,8 @@ In related work, Rahman and Tomar \cite{rahman2020forensic} introduce a forensic
 
 Other research has explored behavioral biometrics as a method for distinguishing automated traffic from legitimate users. Studies in this area analyze signals such as mouse movement patterns, cursor trajectories, and typing dynamics. These techniques can achieve high detection accuracy but often require extensive client-side instrumentation and data collection. While such methods are powerful, they may introduce privacy concerns and implementation complexity. As a result, many smaller systems instead rely on server-side signals that can be collected directly from HTTP logs.
 
+Another line of work examines challenge-based defenses such as CAPTCHAs and rate limiting mechanisms. These defenses attempt to disrupt automated behavior by introducing tasks that are difficult for bots to solve. However, challenge-based approaches can create usability problems for legitimate users and may be circumvented by more sophisticated automation tools. Consequently, researchers increasingly recommend combining behavioral analysis with selective mitigation strategies rather than relying solely on explicit challenges.
+
 \section{Background}
 Automated web bots are software programs that perform tasks on websites without direct human interaction. These bots can serve many legitimate purposes, such as search engine indexing or automated testing. However, malicious bots are frequently used for activities such as credential stuffing, scraping protected data, denial-of-service attacks, and automated purchasing. In the context of limited product releases, reseller bots are designed specifically to monitor inventory availability and execute purchases as quickly as possible.
 
