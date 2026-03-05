@@ -40,6 +40,8 @@ In addition to behavioral detection, web forensics research has explored how ser
 
 Another important concept in bot detection research is the analysis of request burst patterns and session-level activity. Automated scripts frequently perform actions in extremely short time intervals, particularly when attempting to acquire limited inventory. By analyzing sequences of requests within a session, researchers can identify abnormal speed patterns or unrealistic navigation behavior that may indicate automation.
 
+The system proposed in this project builds on these ideas by focusing on interpretable features derived from server-side logs. Instead of relying on proprietary device fingerprints or external intelligence feeds, the project extracts features such as request timing intervals, navigation depth, and action frequency. These features are aggregated at the session level and used to compute a simple risk score that estimates the likelihood that a session represents automated behavior.
+
 \section{Methodology}
 Dijkstra's algorithm was chosen for single-source shortest path computation on graphs with non-negative edge weights, following the implementation presented in CLRS~\cite{clrsAlgorithms}.
 
