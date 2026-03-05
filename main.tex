@@ -23,6 +23,8 @@ Traditional anti-bot systems often rely on large-scale infrastructure and propri
 
 The goal of this research is to design and evaluate a lightweight detection system called \textit{DropGuard Lite}. Rather than relying on complex external services, the system analyzes request logs and session behavior to identify suspicious activity. The approach focuses on timing patterns, navigation behavior, and burst request characteristics that differ between automated bots and legitimate human shoppers. The system computes a per-session risk score and applies mitigation strategies at critical steps such as adding items to a cart or completing checkout.
 
+Another important aspect of this project is the use of real human browsing sessions collected with permission. Many bot detection studies rely on simulated user behavior or public datasets that may not accurately reflect real shopping behavior during product releases. By comparing automated bot sessions with real user sessions interacting with the same web application, this project aims to produce a more realistic evaluation environment. The results may provide insight into which simple behavioral signals are most effective for distinguishing automated purchasing scripts from genuine users.
+
 \section{Related Works}
 
 \section{Methodology}
