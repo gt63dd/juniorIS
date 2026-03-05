@@ -1,0 +1,1 @@
+"""DropGuard Lite application package."""
