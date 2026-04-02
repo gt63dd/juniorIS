@@ -95,23 +95,44 @@ To make the evaluation more useful, the project also includes case-level walkthr
 
 The setup also includes sensitivity checks around thresholds and event windows. Drop behavior can shift quickly, especially around release time, so a feature or threshold that looks reasonable in one window may not behave the same way in another. Testing that sensitivity helps show whether the system is stable enough to be useful and whether certain settings need to adapt over time.
 
-\section{Results}
-An exemplary figure is shown in Figure~\ref{fig:dijkstra}. Any time a figure is used, it must have a capation and be directly referred to and discussed in the text.
+\section{Results and Findings}
+Because the full evaluation is still in progress, this section focuses on qualitative findings rather than final metrics. Even so, the current traces already suggest several patterns that appear repeatedly in sessions that look more suspicious.
 
-%\begin{figure}[b] puts the image to the (closest) bottom of page
-%\begin{figure}[t] puts the image to the (closest) top of page
-%\begin{figure}[h] allows the image to float, putting it roughly wherever it was placed in the text.
-\begin{figure}[b] 
-\begin{center}
-  \includegraphics[width=5cm]{imgs/dijkstra.png}
-  \caption{Dijkstra's algorithm does not work on graphs with negative edge weights, as evidenced here.}
-  \label{fig:dijkstra}
- \end{center}
-\end{figure}
+One pattern is speed through purchase-critical parts of the site. Sessions that appear more suspicious often move into cart and checkout with very little buildup. Compared with typical human sessions, they tend to show less browsing depth and less variation before purchase-oriented actions begin.
 
+Timing also appears to matter. Candidate suspicious sessions often show tighter spacing between requests, especially around release windows. In some cases, the timing looks more regular than what would usually be expected from a human shopper moving through the site manually. Bursts of repeated actions near cart and checkout endpoints also show up frequently in bot-like traces.
 
+At the same time, the project also makes the ambiguity very clear. Highly motivated human users can behave aggressively during a competitive drop. Some users may move quickly, refresh often, or reach checkout with very little browsing. Certain mobile or cached flows may also look compressed in ways that resemble automation. That overlap is one reason the system should not rely on a single signal or a single threshold.
+
+The final version of this section will add quantitative comparisons between session groups, confusion analysis, and a clearer picture of which signals contribute most strongly to high-risk scores. For now, one useful result is that the pipeline already produces session summaries that can be inspected directly. That makes it possible to compare traces, test assumptions, and see where the current evidence is strong or weak before the final metrics are finished.
+
+Another early takeaway is that the system works better when evidence is combined. No single feature appears reliable enough on its own during high-demand drop events. Timing helps, but timing alone is not enough. Navigation depth helps, but it can also be misleading in some cases. Retry behavior matters, but even that needs context. The more useful approach seems to be combining these signals so the score reflects a fuller picture of the session.
+
+\section{Analysis and Discussion}
+The main point that comes out of the current analysis is that server-side behavioral signals can still be useful, even without a heavy detection stack. Looking at behavior at the session level matters a lot here. Suspicious activity is usually easier to spot in the overall sequence of actions than in a single request by itself.
+
+This project supports a middle-ground approach to bot detection. Simpler methods are easier to deploy, easier to inspect, and easier to adjust. At the same time, they are also likely to be less powerful than larger systems that combine many types of telemetry. Even with that limitation, a simpler system can still be worthwhile, especially for smaller storefronts that need something understandable and manageable.
+
+The limits of the approach also need to be stated clearly. Attackers can adapt over time and change the way their sessions look \cite{10.1145/3538969.3538994}. Legitimate users in high-pressure release windows may also resemble bots on basic timing features. Because of that, static one-feature rules are not enough. A more careful combination of signals is necessary, along with periodic review of how the thresholds are behaving.
+
+Compared with using challenge tools everywhere, a risk-based approach can apply friction more selectively and may reduce the number of legitimate users who are affected unnecessarily \cite{10.1145/3672608.3707741}. That is one of the main reasons this kind of system is appealing. It gives operators a way to reserve stronger interventions for the sessions that raise the most concern.
+
+The project also suggests a practical path for deployment. A storefront could begin by using the system only for monitoring and review. From there, the team could study false positives, refine the features, and only then connect the scores to stronger interventions. That step-by-step approach lowers the risk of adopting the system too aggressively and makes policy changes easier to explain.
+
+Another important point is that interpretability should remain important even if the system becomes more sophisticated later. If richer data or learned models are added, the system should still preserve clear reasons for why a session is considered risky. Otherwise, it becomes harder to audit the system and harder to justify its decisions.
 
 \section{Conclusion}
+This thesis examines whether session-level scoring based on server logs can help identify suspicious fast-path checkout automation in limited-release online commerce. DropGuard Lite contributes a clear workflow for reconstructing sessions, extracting behavior-based features, and using those features to support risk-informed decisions.
+
+The contribution of the project is practical. It offers a method that smaller storefronts could realistically begin with, even if they do not have access to a large commercial anti-bot platform. The project treats detection as a problem of session behavior rather than isolated requests, and it keeps the scoring logic separate from the response policy so that interventions can be tuned based on context.
+
+There are still important threats to validity. Labels may be imperfect, aggressive human behavior may overlap with suspicious behavior, and results may depend on the particular storefront or release pattern being studied. The quality and detail of the logs also place limits on what the system can infer.
+
+The current prototype has clear limitations as well. It relies on server-observable behavior, may miss more advanced bots that imitate human patterns closely, and is not presented as a complete solution to bot abuse. The final quantitative evaluation is also still in progress.
+
+Future work could strengthen the project in several ways. One direction is broader validation across different storefronts and release settings. Another is the use of more sequence-aware modeling. A third is combining interpretable rules with learned models while still preserving transparency. Thresholds could also be adapted based on the phase of a drop, and the scoring system could be integrated more tightly with queueing or mitigation workflows.
+
+Overall, DropGuard Lite shows that bot-risk scoring built from existing backend data is worth studying as a realistic starting point. It does not replace a full layered anti-abuse program, but it can still provide useful evidence in environments where operators need a system that is understandable, reproducible, and easier to deploy. More broadly, the project offers a concrete path from a research question to a workflow that could be improved over time as stronger evidence and better calibration become available.
 
 \bibliographystyle{acm}
 \bibliography{bibliography.bib}
