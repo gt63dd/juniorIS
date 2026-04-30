@@ -202,22 +202,25 @@ Fig.~\ref{fig:scatter-threshold-results} presents the score vs. request-rate sca
 \end{figure}
 
 \section{Analysis and Discussion}
-Even before the final quantitative evaluation is complete, the structure of the project already suggests several important points about what the findings are likely to mean.
+The evaluation shows that backend-only session reconstruction can separate fast-path bot runs from human-simulated checkout behavior in this narrow setting. In the controlled dataset, bot sessions exhibited extreme speed and request intensity, and DropGuard Lite translated those patterns into higher risk scores and higher risk-band assignments.
 
-First, the thesis supports the idea that server-side behavioral evidence can still be useful, even without a large anti-bot infrastructure. Looking at behavior at the session level matters because suspicious activity is more visible in full sequences than in isolated requests.
+The most important result is that separation did not require a complex model. A policy-based score built from interpretable session features produced non-overlapping score distributions in this experiment, and a wide middle threshold range cleanly separated the two groups.
 
-Second, the project points toward a middle-ground approach to bot detection. Simpler methods are easier to deploy and inspect, even if they are likely to be less powerful than larger systems that combine many telemetry sources.
+However, the results also show a critical system gap: strong scoring does not automatically yield effective enforcement. The mitigation layer lagged behind the scoring layer. In the current outputs, all 20 bot sessions were still allowed while one human session was delayed. This demonstrates that a risk score is only useful operationally when it is coupled to mitigation policies that reliably convert high confidence into action.
 
-At the same time, the expected findings also come with clear limitations. Attackers can adapt over time and change the way their sessions look \cite{10.1145/3538969.3538994}. More advanced bots may mimic human pacing, introduce fake browsing depth, or spread behavior across identities. Legitimate users in high-pressure release windows may also resemble suspicious sessions on basic timing features. Because of that, I do not expect the final contribution of this thesis to be a claim that simple scoring solves bot abuse in general. A more reasonable conclusion is that it offers a useful first layer of judgment for a narrower problem setting.
+These findings should be interpreted within the constraints of the experiment. The sessions were controlled, the number of runs was limited, and the behavior of the fast-path bots was comparatively extreme. More advanced bots may slow down, add misleading browsing depth, distribute activity across identities, or otherwise adapt over time~\cite{10.1145/3538969.3538994}. Conversely, legitimate users in high-pressure drops can behave aggressively and may partially resemble automation on timing features alone.
 
-Another likely implication is that selective intervention may be more appropriate than blanket friction. If the final system can identify a smaller set of higher-risk sessions, then a storefront could apply stronger defenses more selectively instead of challenging every user equally \cite{10.1145/3672608.3707741}. That possibility is one of the more practical reasons this kind of session-based system is appealing.
-
-More broadly, the project suggests there is value in systems that are modest in scope but strong in transparency, especially for smaller teams that need a deployable and auditable baseline.
-
-This also has implications for operational trust. A transparent scoring workflow gives teams a clearer way to explain decisions to internal reviewers and to improve policies over time. When a score appears wrong, the sequence can be inspected, the threshold can be adjusted, and the same case can be re-evaluated without rebuilding the whole system. That iterative loop is part of what makes a lightweight approach practical.
->>>>>>> a8e787f (revise final paper framing title and abstract)
+Within those limits, DropGuard Lite supports a practical middle ground: a deployable, auditable baseline that can guide selective friction rather than blanket defenses~\cite{10.1145/3672608.3707741}. The key value is transparency: the score is backed by session traces and feature values that can be inspected and tuned.
 
 \section{Conclusion}
+
+This paper evaluated whether session-level analysis of backend activity can support practical bot-risk scoring in limited-release storefronts. I presented DropGuard Lite, a lightweight prototype that ingests backend events, reconstructs sessions, extracts interpretable behavioral features, and assigns a policy-based risk score.
+
+Across 40 controlled sessions, DropGuard Lite assigned substantially higher risk to bot fast-path runs than to human-simulated runs. The resulting distributions did not overlap in this experiment, and a broad middle threshold range separated the two classes cleanly. At the same time, the mitigation layer did not reflect the score: all bot sessions were still allowed while one human session was delayed. This highlights a central point for deployment: scoring quality and enforcement quality are separate problems.
+
+The main limitation of the current evaluation is that it is controlled and narrow. Behavior in real drops is noisier, and adversaries can adapt by slowing down, shaping browsing depth, and distributing activity~\cite{10.1145/3538969.3538994}. Additionally, legitimate users can sometimes resemble automation in high-pressure moments. These factors mean the system should be viewed as a first-layer baseline rather than a complete anti-bot defense.
+
+Future work should strengthen the mitigation layer (policy mapping, selective friction, and operator workflow), extend evaluation to more diverse traffic patterns, and explore sequence-aware scoring while preserving explainability. Even in its current form, DropGuard Lite shows that backend-only signals can support meaningful and inspectable bot-risk scoring for a narrow but important fairness-sensitive checkout setting.
 
 \bibliographystyle{acm}
 \bibliography{bibliography.bib}
