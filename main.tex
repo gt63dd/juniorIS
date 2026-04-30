@@ -9,12 +9,18 @@
 \usepackage[left=1in,right=1in,top=1in,bottom=1in]{geometry}
 \usepackage{graphicx}
 
-\title{\textbf{DropGuard Lite: Log-Based Bot Risk Scoring Using Real Human Checkout Sessions}}
+\usepackage{subcaption}
+
+	itle{\textbf{DropGuard Lite: A Lightweight Log-Based Approach to Fast-Path Bot Risk Scoring in Limited-Release Checkouts}}
 \author{Godfred Tekpor}
 
 \begin{document}
 
 \maketitle
+
+\begin{abstract}
+When a limited product goes live online, speed decides who gets through checkout and who misses the release. That makes these storefronts attractive targets for fast-path bots, especially for smaller sellers that do not have enterprise anti-bot tooling. This paper studies whether ordinary backend activity can still support a useful first layer of bot detection. I present DropGuard Lite, a lightweight server-side prototype that reconstructs sessions from backend events, extracts interpretable behavioral features, and assigns a policy-based risk score. I evaluate the system on 40 controlled sessions, 20 human-simulated runs and 20 bot fast-path runs. In this dataset, bot sessions scored much higher on risk than human sessions, with mean scores of 0.712 and 0.147. They also generated far higher request rates, 4668.389 requests per minute compared with 199.680, while finishing in much shorter time windows, 0.052 seconds compared with 3.851 seconds. The score distributions did not overlap in this experiment, so a broad middle threshold range cleanly separated the two classes. At the same time, the mitigation layer lagged behind the scoring layer, since all bot sessions were still allowed by the current intervention output. These results show that backend logs can support meaningful and explainable bot-risk scoring in a narrow checkout setting, while also showing that good scoring does not automatically mean good enforcement.
+\end{abstract}
 
 \section{Introduction}
 Online retail platforms increasingly face challenges from automated bots that exploit limited product releases. In industries such as sneaker sales and streetwear fashion, highly anticipated product drops occur within extremely short time windows where thousands of customers attempt to purchase the same limited inventory simultaneously. During these events, automated reseller bots can rapidly add items to carts and complete checkout processes much faster than human users. As a result, real customers are often unable to purchase products, while automated systems acquire inventory that is later resold at inflated prices. This behavior creates fairness concerns for consumers and operational challenges for retailers.
@@ -57,23 +63,159 @@ Another important concept in bot detection research is the analysis of request b
 The system proposed in this project builds on these ideas by focusing on interpretable features derived from server-side logs. Instead of relying on proprietary device fingerprints or external intelligence feeds, the project extracts features such as request timing intervals, navigation depth, and action frequency. These features are aggregated at the session level and used to compute a simple risk score that estimates the likelihood that a session represents automated behavior.
 
 \section{Methodology}
-Dijkstra's algorithm was chosen for single-source shortest path computation on graphs with non-negative edge weights, following the implementation presented in CLRS~\cite{clrsAlgorithms}.
 
-\section{Results}
-An exemplary figure is shown in Figure~\ref{fig:dijkstra}. Any time a figure is used, it must have a capation and be directly referred to and discussed in the text.
+DropGuard Lite treats bot scoring as a session-level evidence problem. It does not try to infer intent directly, and it does not depend on browser fingerprinting, mouse telemetry, or external threat feeds. Instead, it asks whether suspicious checkout behavior can be recognized through timing, navigation, and action concentration once backend events are grouped into sessions.
 
-%\begin{figure}[b] puts the image to the (closest) bottom of page
-%\begin{figure}[t] puts the image to the (closest) top of page
-%\begin{figure}[h] allows the image to float, putting it roughly wherever it was placed in the text.
-\begin{figure}[b] 
-\begin{center}
-  \includegraphics[width=5cm]{imgs/dijkstra.png}
-  \caption{Dijkstra's algorithm does not work on graphs with negative edge weights, as evidenced here.}
-  \label{fig:dijkstra}
- \end{center}
+The first step is event collection. The system records storefront activity tied to browsing, cart, and checkout behavior. Each event includes the basic context needed for later analysis, such as a timestamp, an event type, an endpoint, a session identifier, and any relevant metadata.
+
+The second step is session reconstruction. Events are grouped into ordered timelines so the system can interpret behavior as a flow instead of a pile of disconnected records. That step matters because the meaning of an action depends on what came before it and how quickly the session arrived there.
+
+The third step is feature extraction. The feature set is built around timing, navigation, and action concentration. Timing features capture speed and regularity, including session duration, inter-event spacing, and burstiness near critical endpoints. Navigation features capture browsing depth and coverage before purchase-critical activity. Action-based features capture retries, repeated bursts, and concentration around cart and checkout behavior.
+
+The fourth step is risk scoring. In the current prototype, scoring is policy-based rather than learned through a black-box classifier. Each session is evaluated using a set of rules and weighted signals that reflect suspicious patterns. The output is not treated as a final accusation of bot activity. Instead, it is treated as a risk indicator that can support different responses depending on context.
+
+This distinction between evidence and policy is important. The features describe what happened in the session. The thresholds describe how aggressively the system chooses to respond. Different storefronts may tolerate different levels of false positives. A store may decide to use the score only for monitoring, for queue prioritization, for selective friction, or for manual review. Keeping the evidence pipeline separate from the intervention policy makes those tradeoffs more visible and easier to adjust.
+
+The methodology is scoped to fast-path checkout automation rather than every type of bot. A bot that scrapes content or mimics long browsing sessions may need a different feature set. Here, the main concern is suspicious speed, compressed flow, repeated critical actions, and minimal browsing depth during high-demand product releases.
+
+\section{System Design and Implementation}
+DropGuard Lite is implemented as a prototype using FastAPI, SQLite, and a lightweight React-based review interface. The architecture is intentionally simple because one of the goals of the project is to show that a usable bot-risk workflow can be built without a heavy infrastructure stack.
+
+The system has four main layers: telemetry intake, storage, analytics, and review. The telemetry layer captures relevant storefront events as users move through browsing, cart, and checkout flows. Middleware records request-level activity, while selected application events add context where useful. These events are then written into storage.
+
+The storage layer is designed around sessions and events. Event records preserve the sequence of actions over time. Session summaries are updated or inserted as activity arrives. Keeping these two views separate makes it easier to both reconstruct detailed traces and compute higher-level behavioral summaries.
+
+The analytics layer transforms raw event logs into session-level outputs. It reconstructs ordered timelines, computes feature summaries, and prepares the data needed for risk scoring. This layer is where the project’s core logic lives. Instead of focusing on individual requests, it operates on the broader history of a session. That makes it possible to identify compressed checkout paths, repeated retries, and shallow navigation patterns that would be difficult to detect from isolated records.
+
+The review layer exposes these outputs through a lightweight interface. Rather than presenting only a final score, the interface makes it possible to inspect event history, feature summaries, and session-level context. This is useful both for evaluation and for explainability. If a session appears suspicious, the reviewer can inspect the sequence directly and understand what contributed to the concern.
+
+The processing pipeline moves through five stages. First, the system ingests incoming events. Second, it updates stored session state. Third, it reconstructs timelines from the recorded data. Fourth, it computes behavioral features. Fifth, it prepares the output for scoring and review. Structuring the system this way keeps the workflow modular and makes it easier to test individual components separately.
+
+At the current stage of development, telemetry capture, session reconstruction, and feature extraction are implemented and working. The scoring layer is partially implemented, and the review workflow is already sufficient for inspecting suspicious and human-like sessions side by side. What remains less mature is the fully integrated mitigation layer. In other words, the project already supports detection-oriented analysis, but it is not yet a production-ready enforcement system.
+
+This distinction matters because the thesis represents the project honestly. The core technical contribution is the session-based analysis pipeline and the risk-scoring framework built on top of it. DropGuard Lite is a research prototype, not a finished commercial anti-bot platform.
+
+\section{Evaluation Setup}
+The evaluation for this project is designed to answer a practical question: do reconstructed session traces contain enough information to help distinguish suspicious fast-path behavior from legitimate human checkout activity in a limited-release environment?
+
+Because the project is still in progress, this section describes the evaluation design and the way the system will be assessed rather than presenting a completed experimental study. The goal at this stage is to show how the project will be evaluated once the remaining implementation and labeling work are finalized.
+
+The planned evaluation compares two broad categories of sessions. The first category consists of legitimate human sessions collected in the project environment. These sessions represent real browsing and checkout behavior under ordinary or high-intensity conditions. The second category consists of suspicious or bot-like sessions represented through controlled automated traces and rule-labeled patterns. These traces are not meant to represent every possible bot strategy. Instead, they are meant to capture the narrower class of fast-path behavior that DropGuard Lite is designed to study.
+
+The evaluation will focus on three main criteria.
+
+First, I will evaluate separability. This asks whether suspicious sessions and human sessions show meaningful differences in the behavioral features computed by the system. If suspicious sessions consistently move faster, browse less, and concentrate their actions differently, then the feature set is capturing something useful.
+
+Second, I will evaluate interpretability. A session-level scoring system is only useful in practice if operators can understand why a session appears risky. For that reason, the evaluation will include case-level walkthroughs of representative sessions across different risk bands. These walkthroughs will be used to show whether the system’s judgments line up with visible evidence in the trace.
+
+Third, I will evaluate practical usefulness. Even if a feature set shows some statistical difference between groups, that alone does not make it operationally helpful. The more important question is whether the output could realistically support monitoring, manual review, queue placement, or selective friction in a small storefront environment.
+
+The final quantitative version of the evaluation is expected to report precision, recall, false positive tendencies, and confusion patterns, along with ranked review of high-risk sessions. Sensitivity checks around thresholds and event windows are also planned, since release behavior can shift quickly during a drop. Label quality will be treated as a core validity issue rather than a background assumption.
+
+Another part of the setup is practical review workflow. In addition to aggregate metrics, I plan to sample sessions from low, medium, and high risk bands and verify whether the underlying traces match the assigned level. This supports two goals at once: it checks whether the scoring logic is internally consistent, and it helps identify false positives early before stronger intervention policies are attached to the score.
+
+\section{Results and Findings}
+The controlled experiment produced 40 sessions in total: 20 human-simulated runs and 20 bot fast-path runs. Key aggregate numbers used throughout the analysis appear exactly as recorded in the experiment logs: total sessions 40, human-simulated 20, bot fast-path 20.
+
+Across the runs, the human-simulated sessions had a mean risk score of 0.147 (range 0.100 to 0.176), while bot fast-path sessions had a mean risk score of 0.712 (range 0.692 to 0.765). Human sessions averaged 199.680 requests per minute (range 112.904 to 250.208), and bot sessions averaged 4668.389 requests per minute (range 3768.075 to 5591.538). Session durations were 3.851 seconds on average for humans and 0.052 seconds on average for bots.
+
+Other summary statistics used in the paper appear verbatim from the experiment outputs: human HTTP request count 12.7, burstiness 1.252, unique paths 5.85, total events 18.65; bot HTTP request count 4.0, burstiness 0.285, unique paths 4.0, total events 6.0.
+
+All 20 human sessions were labeled low risk. The 20 bot sessions split into 11 medium-risk and 9 high-risk assignments. In this controlled dataset, the human and bot risk-score distributions do not overlap; any threshold between about 0.18 and 0.69 would perfectly separate the two classes. At threshold 0.70, recall drops to 0.45 while the false positive rate remains 0.00.
+
+Importantly, the mitigation layer is not yet aligned with the scoring layer. In the current system output, all 20 bot sessions were still allowed and one human session was delayed. That mismatch is a clear limitation discussed later.
+
+The separation between classes is visible in the core distributions shown in Fig.~\ref{fig:score-request-distributions}. Human sessions cluster at low scores and modest request rates while bot sessions concentrate at high scores and extreme request rates.
+
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_1_risk_score_distribution.png}
+	\caption{Risk score distribution by session type.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_2_request_rate_distribution.png}
+	\caption{Request rate distribution by session type.}
+\end{subfigure}
+\caption{Core class separation in the controlled evaluation. Human and bot sessions were clearly separated by both risk score and request rate.}
+\label{fig:score-request-distributions}
 \end{figure}
 
+The run-level consistency is shown in Fig.~\ref{fig:run-band-results}. Human sessions remain clustered at the low end of the score range and bot sessions remain near the high end. The risk-band counts reflect the stated split: all humans low, bots medium/high.
 
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_3_risk_score_over_runs.png}
+	\caption{Risk score across experiment runs.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_4_risk_band_counts.png}
+	\caption{Risk band assignments by session type.}
+\end{subfigure}
+\caption{Run-level consistency of the scoring layer. Human sessions stayed in the low-risk range, while bot sessions concentrated in the medium- and high-risk bands.}
+\label{fig:run-band-results}
+\end{figure}
+
+Fig.~\ref{fig:mitigation-normalized-results} shows normalized features and mitigation outcomes. The feature comparison highlights that bot sessions were dominated by extreme speed and compressed flows. The mitigation plot shows that the current intervention logic did not block bot runs: all 20 bots were allowed and one human was delayed.
+
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_5_mitigation_actions.png}
+	\caption{Mitigation actions by session type.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_6_normalized_feature_comparison.png}
+	\caption{Normalized feature comparison by session type.}
+\end{subfigure}
+\caption{The current mitigation outputs lag behind the scoring results. The feature comparison also shows that bot sessions were dominated by extreme speed, while human sessions were longer and richer in event activity.}
+\label{fig:mitigation-normalized-results}
+\end{figure}
+
+Fig.~\ref{fig:scatter-threshold-results} presents the score vs. request-rate scatter and the threshold tradeoff. Because the score distributions did not overlap, a threshold between 0.18 and 0.69 perfectly separated classes in this experiment. Moving the threshold higher (for example, to 0.70) reduces recall to 0.45 while keeping false positives at 0.00.
+
+\begin{figure}[t]
+\centering
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_7_risk_score_vs_request_rate.png}
+	\caption{Risk score versus request rate.}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\linewidth}
+	\centering
+	\includegraphics[width=\linewidth]{figures/figure_8_detection_threshold_tradeoff.png}
+	\caption{Threshold tradeoff across risk-score cutoffs.}
+\end{subfigure}
+\caption{Relationship between request intensity and risk scoring, plus the threshold tradeoff observed in this controlled dataset.}
+\label{fig:scatter-threshold-results}
+\end{figure}
+
+\section{Analysis and Discussion}
+Even before the final quantitative evaluation is complete, the structure of the project already suggests several important points about what the findings are likely to mean.
+
+First, the thesis supports the idea that server-side behavioral evidence can still be useful, even without a large anti-bot infrastructure. Looking at behavior at the session level matters because suspicious activity is more visible in full sequences than in isolated requests.
+
+Second, the project points toward a middle-ground approach to bot detection. Simpler methods are easier to deploy and inspect, even if they are likely to be less powerful than larger systems that combine many telemetry sources.
+
+At the same time, the expected findings also come with clear limitations. Attackers can adapt over time and change the way their sessions look \cite{10.1145/3538969.3538994}. More advanced bots may mimic human pacing, introduce fake browsing depth, or spread behavior across identities. Legitimate users in high-pressure release windows may also resemble suspicious sessions on basic timing features. Because of that, I do not expect the final contribution of this thesis to be a claim that simple scoring solves bot abuse in general. A more reasonable conclusion is that it offers a useful first layer of judgment for a narrower problem setting.
+
+Another likely implication is that selective intervention may be more appropriate than blanket friction. If the final system can identify a smaller set of higher-risk sessions, then a storefront could apply stronger defenses more selectively instead of challenging every user equally \cite{10.1145/3672608.3707741}. That possibility is one of the more practical reasons this kind of session-based system is appealing.
+
+More broadly, the project suggests there is value in systems that are modest in scope but strong in transparency, especially for smaller teams that need a deployable and auditable baseline.
+
+This also has implications for operational trust. A transparent scoring workflow gives teams a clearer way to explain decisions to internal reviewers and to improve policies over time. When a score appears wrong, the sequence can be inspected, the threshold can be adjusted, and the same case can be re-evaluated without rebuilding the whole system. That iterative loop is part of what makes a lightweight approach practical.
+>>>>>>> a8e787f (revise final paper framing title and abstract)
 
 \section{Conclusion}
 
