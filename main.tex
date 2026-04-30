@@ -11,7 +11,7 @@
 
 \usepackage{subcaption}
 
-	itle{\textbf{DropGuard Lite: A Lightweight Log-Based Approach to Fast-Path Bot Risk Scoring in Limited-Release Checkouts}}
+	\title{\textbf{DropGuard Lite: A Lightweight Log-Based Approach to Fast-Path Bot Risk Scoring in Limited-Release Checkouts}}
 \author{Godfred Tekpor}
 
 \begin{document}
@@ -131,13 +131,13 @@ The separation between classes is visible in the core distributions shown in Fig
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_1_risk_score_distribution.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_1_risk_score_distribution.png}
 	\caption{Risk score distribution by session type.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_2_request_rate_distribution.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_2_request_rate_distribution.png}
 	\caption{Request rate distribution by session type.}
 \end{subfigure}
 \caption{Core class separation in the controlled evaluation. Human and bot sessions were clearly separated by both risk score and request rate.}
@@ -150,13 +150,13 @@ The run-level consistency is shown in Fig.~\ref{fig:run-band-results}. Human ses
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_3_risk_score_over_runs.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_3_risk_score_over_runs.png}
 	\caption{Risk score across experiment runs.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_4_risk_band_counts.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_4_risk_band_counts.png}
 	\caption{Risk band assignments by session type.}
 \end{subfigure}
 \caption{Run-level consistency of the scoring layer. Human sessions stayed in the low-risk range, while bot sessions concentrated in the medium- and high-risk bands.}
@@ -169,13 +169,13 @@ Fig.~\ref{fig:mitigation-normalized-results} shows normalized features and mitig
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_5_mitigation_actions.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_5_mitigation_actions.png}
 	\caption{Mitigation actions by session type.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_6_normalized_feature_comparison.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_6_normalized_feature_comparison.png}
 	\caption{Normalized feature comparison by session type.}
 \end{subfigure}
 \caption{The current mitigation outputs lag behind the scoring results. The feature comparison also shows that bot sessions were dominated by extreme speed, while human sessions were longer and richer in event activity.}
@@ -188,13 +188,13 @@ Fig.~\ref{fig:scatter-threshold-results} presents the score vs. request-rate sca
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_7_risk_score_vs_request_rate.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_7_risk_score_vs_request_rate.png}
 	\caption{Risk score versus request rate.}
 \end{subfigure}
 \hfill
 \begin{subfigure}[t]{0.48\linewidth}
 	\centering
-	\includegraphics[width=\linewidth]{figures/figure_8_detection_threshold_tradeoff.png}
+	\includegraphics[width=\linewidth]{experiment_graphs/figure_8_detection_threshold_tradeoff.png}
 	\caption{Threshold tradeoff across risk-score cutoffs.}
 \end{subfigure}
 \caption{Relationship between request intensity and risk scoring, plus the threshold tradeoff observed in this controlled dataset.}
